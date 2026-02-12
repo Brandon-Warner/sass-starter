@@ -1,8 +1,7 @@
-"use client"
-
+import { redirect } from "next/navigation"
 import { EnvelopeClosedIcon } from "@radix-ui/react-icons"
-import { toast } from "sonner"
 
+import { onboardingClient } from "@/lib/auth0"
 import {
   Card,
   CardDescription,
@@ -10,11 +9,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { SubmitButton } from "@/components/submit-button"
 
-import { resendVerificationEmail } from "./actions"
+import { ResendVerificationForm } from "./resend-verification-form"
 
-export default function Verify() {
+export default async function Verify() {
+  const session = await onboardingClient.getSession()
+
+  // If user is already verified, redirect to organization creation
+  if (session?.user?.email_verified) {
+    redirect("/onboarding/create")
+  }
+
   return (
     <Card className="mx-auto max-w-sm">
       <CardHeader>
@@ -28,22 +33,7 @@ export default function Verify() {
         </CardDescription>
       </CardHeader>
       <CardFooter>
-        <form
-          action={async () => {
-            const { error } = await resendVerificationEmail()
-
-            if (error) {
-              toast.error(error)
-              return
-            }
-
-            toast.success(
-              "The verification e-mail has successfully been sent. Please check your inbox."
-            )
-          }}
-        >
-          <SubmitButton>Resend Verification</SubmitButton>
-        </form>
+        <ResendVerificationForm />
       </CardFooter>
     </Card>
   )

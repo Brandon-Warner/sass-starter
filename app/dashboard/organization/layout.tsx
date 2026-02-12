@@ -51,9 +51,9 @@ export default async function AccountLayout({ children }: AccountLayoutProps) {
         <Card className="w-[450px]">
           <CardHeader>
             <CardTitle>Unauthorized</CardTitle>
-            <CardDescription className="space-y-1.5">
+            <div className="space-y-1.5 text-sm text-muted-foreground">
               <p>
-                You’re currently logged in with the role of{" "}
+                You're currently logged in with the role of{" "}
                 <span className="font-semibold">{getRole(session.user)}</span>.
               </p>
               <p>
@@ -61,7 +61,7 @@ export default async function AccountLayout({ children }: AccountLayoutProps) {
                 <span className="font-semibold">admin</span> role to manage your
                 Organization&apos;s settings.
               </p>
-            </CardDescription>
+            </div>
           </CardHeader>
           <CardFooter>
             <Link href="/dashboard" className="w-full">

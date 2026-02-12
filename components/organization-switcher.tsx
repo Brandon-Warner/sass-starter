@@ -45,7 +45,11 @@ export function OrganizationSwitcher({
   const [open, setOpen] = useState(false)
   const router = useRouter()
 
-  const organization = organizations.find((org) => org.id === currentOrgId)!
+  const organization = organizations.find((org) => org.id === currentOrgId) || organizations[0]
+
+  if (!organization) {
+    return null
+  }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
