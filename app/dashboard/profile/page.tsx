@@ -16,6 +16,20 @@ export default appClient.withPageAuthRequired(
     const session = await appClient.getSession()
     const accessTokenResponse = await appClient.getAccessToken()
 
+    let decodedToken = null
+    if (accessTokenResponse?.token) {
+      try {
+        const parts = accessTokenResponse.token.split(".")
+        if (parts.length === 3) {
+          decodedToken = JSON.parse(
+            Buffer.from(parts[1], "base64").toString()
+          )
+        }
+      } catch (error) {
+        console.error("Error decoding token:", error)
+      }
+    }
+
     return (
       <div className="space-y-6">
         <PageHeader
@@ -48,25 +62,41 @@ export default appClient.withPageAuthRequired(
             <div className="space-y-4">
               <div>
                 <p className="mb-2 text-sm font-medium">Token:</p>
-                <pre className="overflow-auto rounded-md bg-muted p-4 text-xs">
-                  <code>{accessTokenResponse?.accessToken}</code>
+                <pre className="max-w-2xl overflow-auto rounded-md bg-muted p-4 text-xs">
+                  <code>{accessTokenResponse?.token}</code>
                 </pre>
               </div>
-              {accessTokenResponse?.accessToken && (
-                <div>
-                  <p className="mb-2 text-sm font-medium">Decoded Payload:</p>
-                  <pre className="overflow-auto rounded-md bg-muted p-4 text-xs">
+              {accessTokenResponse?.token && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium">Decoded Payload:</p>
+                    <a
+                      href={`https://jwt.io/#debugger-io?token=${accessTokenResponse.token}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-blue-600 hover:text-blue-700 hover:underline"
+                    >
+                      Decode on jwt.io →
+                    </a>
+                  </div>
+                  <pre className="max-w-2xl overflow-auto rounded-md bg-muted p-4 text-xs">
                     <code>
-                      {JSON.stringify(
-                        JSON.parse(
-                          Buffer.from(
-                            accessTokenResponse.accessToken.split(".")[1],
-                            "base64"
-                          ).toString()
-                        ),
-                        null,
-                        2
-                      )}
+                      {(() => {
+                        try {
+                          return JSON.stringify(
+                            JSON.parse(
+                              Buffer.from(
+                                accessTokenResponse.token.split(".")[1],
+                                "base64"
+                              ).toString()
+                            ),
+                            null,
+                            2
+                          )
+                        } catch (error) {
+                          return "Error decoding token payload"
+                        }
+                      })()}
                     </code>
                   </pre>
                 </div>
