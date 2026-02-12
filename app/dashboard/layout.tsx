@@ -51,6 +51,13 @@ export default async function DashboardLayout({
           >
             Home
           </Link>
+
+          <Link
+            href="/dashboard/profile"
+            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Tokens
+          </Link>
         </div>
 
         <div className="flex flex-row gap-x-4">

@@ -1,0 +1,81 @@
+import React from "react"
+
+import { AppRouterPageRoute } from "@auth0/nextjs-auth0/server"
+import { appClient } from "@/lib/auth0"
+import { PageHeader } from "@/components/page-header"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+
+export default appClient.withPageAuthRequired(
+  async function ProfileTokens() {
+    const session = await appClient.getSession()
+    const accessTokenResponse = await appClient.getAccessToken()
+
+    return (
+      <div className="space-y-6">
+        <PageHeader
+          title="Profile Tokens"
+          description="View your decrypted ID and Access tokens from Auth0."
+        />
+
+        <Card>
+          <CardHeader>
+            <CardTitle>ID Token</CardTitle>
+            <CardDescription>
+              Decoded user information from your ID token
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <pre className="overflow-auto rounded-md bg-muted p-4 text-xs">
+              <code>{JSON.stringify(session?.user, null, 2)}</code>
+            </pre>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Access Token</CardTitle>
+            <CardDescription>
+              Raw access token used for API authentication
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <p className="mb-2 text-sm font-medium">Token:</p>
+                <pre className="overflow-auto rounded-md bg-muted p-4 text-xs">
+                  <code>{accessTokenResponse?.accessToken}</code>
+                </pre>
+              </div>
+              {accessTokenResponse?.accessToken && (
+                <div>
+                  <p className="mb-2 text-sm font-medium">Decoded Payload:</p>
+                  <pre className="overflow-auto rounded-md bg-muted p-4 text-xs">
+                    <code>
+                      {JSON.stringify(
+                        JSON.parse(
+                          Buffer.from(
+                            accessTokenResponse.accessToken.split(".")[1],
+                            "base64"
+                          ).toString()
+                        ),
+                        null,
+                        2
+                      )}
+                    </code>
+                  </pre>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  } as AppRouterPageRoute,
+  { returnTo: "/dashboard/profile" }
+) as React.FC
